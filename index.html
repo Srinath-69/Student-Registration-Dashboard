@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e0e0e0;
+            background-image: url('assets/images/background.png');
+            background-size: cover;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        body.dark-mode h1 {
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.85);
+            position: relative;
+            overflow: hidden;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        body.dark-mode .container {
+            background: rgba(30, 30, 30, 0.85);
+        }
+        /* Premium footer styles */
+        .site-footer {
+            margin-top: 40px;
+            background: linear-gradient(180deg, rgba(10,25,47,0.98), rgba(3,16,37,0.98));
+            color: #dbeafe;
+            padding: 36px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(2,6,23,0.45);
+        }
+        .site-footer a { color: #a5f3fc; text-decoration: none; }
+        .footer-container { max-width: 1100px; margin: 0 auto; display: flex; gap: 24px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+        .footer-brand h3 { margin: 0 0 6px 0; color: #fff; }
+        .footer-brand p { margin:0; color: #cbd5e1; opacity:0.9 }
+        .footer-col { flex: 1 1 220px; min-width: 220px; }
+        .footer-links h4, .footer-contact h4 { margin: 0 0 8px 0; color:#e6f6ff }
+        .footer-contact form { display:flex; flex-direction:column; gap:8px; }
+        .footer-contact input, .footer-contact textarea { padding:8px; border-radius:6px; border:1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); color: #fff; }
+        .footer-contact textarea { min-height:80px; resize:vertical }
+        .footer-contact button { background: #06b6d4; border: none; color: #04263b; padding: 10px 12px; border-radius:8px; cursor:pointer; font-weight:700 }
+        .footer-bottom { text-align:center; margin-top:18px; color: rgba(219,234,254,0.65); font-size:13px }
+        @media (max-width: 720px) {
+            .footer-container { flex-direction: column; gap: 14px; }
+            .footer-col { min-width: auto; }
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        body.dark-mode input, body.dark-mode select {
+            background: #333;
+            color: #e0e0e0;
+            border-color: #555;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #error-message {
+            color: red;
+            margin-top: 10px;
+        }
+        #success-message {
+            color: green;
+            margin-top: 10px;
+        }
+        /* dark mode toggle wrapper positions bulb and its label */
+        #dark-toggle-wrapper {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: center;
+        }
+        #dark-mode-toggle {
+            font-size: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        body.dark-mode #dark-mode-toggle {
+            color: #fff;
+        }
+        /* small label below the dark-mode bulb */
+        #darkmode-label {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            pointer-events: none;
+            user-select: none;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+        body.dark-mode #darkmode-label {
+            color: #e0e0e0;
+            opacity: 0.95;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div id="dark-toggle-wrapper">
+        <button id="dark-mode-toggle">💡</button>
+        <div id="darkmode-label">Dark Mode</div>
+    </div>
+    <div class="container">
+        <h1>Student Registration</h1>
+        <form id="registration-form">
+            <label for="name">Name:</label>
+            <input type="text" id="name" required>
+
+            <label for="rollno">Roll No.:</label>
+            <input type="text" id="rollno" required>
+
+            <label for="branch">Branch:</label>
+            <select id="branch" required>
+                <option value="">Select Branch</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Electrical Engineering">Electrical Engineering</option>
+                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                <option value="Civil Engineering">Civil Engineering</option>
+                <option value="Others">Others</option>
+            </select>
+            <input type="text" id="other-branch" placeholder="Please specify your branch" style="display:none; margin-top: 5px;">
+
+            <label for="year">Year:</label>
+            <select id="year" required>
+                <option value="">Select Year</option>
+                <option value="1st Year">1st Year</option>
+                <option value="2nd Year">2nd Year</option>
+                <option value="3rd Year">3rd Year</option>
+                <option value="4th Year">4th Year</option>
+            </select>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" required>
+
+            <button type="submit" id="submit-btn">Register</button>
+            <div id="error-message"></div>
+            <div id="success-message"></div>
+        </form>
+        <p>Admin? <a href="admin.html" style="color: #4CAF50; font-weight: bold;">Login here</a></p>
+    </div>
+
+    <!-- Contact Us Footer -->
+    <footer class="site-footer" aria-label="Contact us footer">
+        <div class="footer-container">
+            <div class="footer-col footer-brand">
+                <h3>Student Registration</h3>
+                <p>Simple, secure student registration </p>
+                <p>questions or feedback, we're here to help !!</p>
+            </div>
+            <div class="footer-col footer-links">
+                <h4>Contact</h4>
+                <p>Email: <a href="mailto:support@gmail.com">support@gmail.com</a></p>
+                <p>Phone: <a href="tel:+1234567890">+1 (234) 567-890</a></p>
+                <p style="margin-top:8px;">Follow us:</p>
+                <div style="display:flex; gap:8px; margin-top:6px;">
+                    <a href="#" aria-label="Twitter" style="color:inherit">Twitter</a>
+                    <a href="#" aria-label="LinkedIn" style="color:inherit">LinkedIn</a>
+                </div>
+            </div>
+            <div class="footer-col footer-contact">
+                <h4>Get in touch</h4>
+                <form id="contact-form">
+                    <input id="contact-email" type="email" placeholder="Your email" required>
+                    <textarea id="contact-msg" placeholder="Message" required></textarea>
+                    <button type="submit">Send</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">© <span id="footer-year"></span> Student Registration — All rights reserved.</div>
+    </footer>
+
+    <script>
+        // EmailJS Initialization - Replace with your details
+        emailjs.init({ publicKey: "YOUR_PUBLIC_KEY_HERE" }); // Get from emailjs.com dashboard
+
+        const form = document.getElementById('registration-form');
+        const errorMessage = document.getElementById('error-message');
+        const successMessage = document.getElementById('success-message');
+        const submitBtn = document.getElementById('submit-btn');
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+
+        let students = [];
+        let db;
+
+        // Initialize IndexedDB
+        const request = indexedDB.open('StudentDB', 1);
+        request.onerror = () => console.error('IndexedDB error');
+        request.onsuccess = () => {
+            db = request.result;
+            loadStudents();
+        };
+        request.onupgradeneeded = (event) => {
+            db = event.target.result;
+            db.createObjectStore('students', { keyPath: 'rollno' });
+        };
+
+        function loadStudents() {
+            const transaction = db.transaction(['students'], 'readonly');
+            const store = transaction.objectStore('students');
+            const getAll = store.getAll();
+            getAll.onsuccess = () => {
+                students = getAll.result || [];
+            };
+        }
+
+        function saveStudent(student) {
+            const transaction = db.transaction(['students'], 'readwrite');
+            const store = transaction.objectStore('students');
+            store.add(student);
+        }
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value.trim();
+            const rollno = document.getElementById('rollno').value.trim();
+            const branch = document.getElementById('branch').value;
+            const year = document.getElementById('year').value;
+            const email = document.getElementById('email').value.trim();
+
+            if (!validateForm(name, rollno, branch, year, email)) {
+                return;
+            }
+
+            const student = { name, rollno, branch, year, email };
+            students.push(student);
+            saveStudent(student);
+
+            // Send confirmation email
+            emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+                to_email: email,
+                name: name,
+                rollno: rollno,
+                branch: branch,
+                year: year
+            }).then(() => {
+            successMessage.textContent = 'Registration successful! Confirmation email sent.';
+            }, (error) => {
+            console.error('Email send error:', error.status, error.text, error);
+            successMessage.textContent = 'Registration successful! (Email failed to send: ' + (error.text || 'Unknown error') + ')';
+        });
+
+            form.reset();
+            errorMessage.textContent = '';
+            setTimeout(() => successMessage.textContent = '', 5000);
+        });
+
+        function validateForm(name, rollno, branch, year, email) {
+            errorMessage.textContent = '';
+
+            if (name === '' || name.length < 3) {
+                errorMessage.textContent = 'Name is required and must be at least 3 characters.';
+                return false;
+            }
+            if (rollno === '' || !/^[a-zA-Z0-9]{6,11}$/.test(rollno)) {
+                errorMessage.textContent = 'Roll No. is required and must be 6-11 alphanumeric characters.';
+                return false;
+            }
+            if (branch === '') {
+                errorMessage.textContent = 'Branch is required.';
+                return false;
+            }
+            if (year === '') {
+                errorMessage.textContent = 'Year is required.';
+                return false;
+            }
+            if (email === '' || !/\S+@\S+\.\S+/.test(email)) {
+                errorMessage.textContent = 'Valid email is required.';
+                return false;
+            }
+
+            const duplicate = students.some(s => s.rollno === rollno || s.email === email);
+            if (duplicate) {
+                errorMessage.textContent = 'Roll No. or Email already exists.';
+                return false;
+            }
+
+            return true;
+        }
+
+        // Dark Mode
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+        }
+        darkModeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
+        });
+
+        // Footer: set current year and handle contact form via mailto
+        document.getElementById('footer-year').textContent = new Date().getFullYear();
+        const contactForm = document.getElementById('contact-form');
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('contact-email').value.trim();
+            const msg = document.getElementById('contact-msg').value.trim();
+            if (!email || !msg) return;
+            const to = 'support@example.com';
+            const subject = encodeURIComponent('Contact from Student Registration');
+            const body = encodeURIComponent(`From: ${email}\n\n${msg}`);
+            // Open user's mail client with prefilled message
+            window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+            contactForm.reset();
+        });
+    </script>
+</body>
+</html>

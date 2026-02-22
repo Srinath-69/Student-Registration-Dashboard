@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            background-image: url('assets/images/background.png');
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        body.dark-mode h1, body.dark-mode h2 {
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        body.dark-mode .container {
+            background: rgba(30, 30, 30, 0.9);
+        }
+        #login-form {
+            display: flex;
+            flex-direction: column;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        #admin-content {
+            display: none;
+        }
+        label {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        body.dark-mode input, body.dark-mode select {
+            background: #333;
+            color: #e0e0e0;
+            border-color: #555;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #error-message {
+            color: red;
+            margin-top: 10px;
+        }
+        #search-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filters select {
+            flex: 1;
+        }
+        table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        body.dark-mode th, body.dark-mode td {
+            border-bottom: 1px solid #444;
+        }
+        th {
+            background-color: #f2f2f2;
+            cursor: pointer;
+        }
+        body.dark-mode th {
+            background-color: #333;
+        }
+        .actions button {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .edit-btn {
+            background-color: #FFC107;
+            color: white;
+        }
+        .delete-btn {
+            background-color: #F44336;
+            color: white;
+        }
+        .edit-btn:hover {
+            background-color: #e0a800;
+        }
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .pagination button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            background: #ddd;
+            border: none;
+            cursor: pointer;
+        }
+        body.dark-mode .pagination button {
+            background: #444;
+            color: #e0e0e0;
+        }
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        body.dark-mode #dark-mode-toggle {
+            color: #fff;
+        }
+        #export-csv, #export-json, #import-json {
+            margin-top: 10px;
+            background: #2196F3;
+        }
+        #export-csv:hover, #export-json:hover, #import-json:hover {
+            background: #1e88e5;
+        }
+        #import-file {
+            margin-top: 10px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            table {
+                font-size: 14px;
+            }
+            .filters {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button id="dark-mode-toggle">💡</button>
+    <div class="container">
+        <h1>Admin Dashboard</h1>
+        <div id="login-section">
+            <form id="login-form">
+                <label for="security-key">Security Key:</label>
+                <input type="password" id="security-key" required>
+                <button type="submit">Login</button>
+                <div id="login-error" style="color: red; margin-top: 10px;"></div>
+            </form>
+        </div>
+        <div id="admin-content">
+            <button id="logout-btn">Logout</button>
+            <h2>Registered Students</h2>
+            <input type="text" id="search-input" placeholder="Search by name, roll no., or email...">
+            <div class="filters">
+                <select id="branch-filter">
+                    <option value="all">All Branches</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Electrical Engineering">Electrical Engineering</option>
+                    <option value="Mechanical Engineering">Mechanical Engineering</option>
+                    <option value="Civil Engineering">Civil Engineering</option>
+                </select>
+                <select id="year-filter">
+                    <option value="all">All Years</option>
+                    <option value="1st Year">1st Year</option>
+                    <option value="2nd Year">2nd Year</option>
+                    <option value="3rd Year">3rd Year</option>
+                    <option value="4th Year">4th Year</option>
+                </select>
+            </div>
+            <table id="student-table">
+                <thead>
+                    <tr>
+                        <th data-sort="name">Name &#x21C5;</th>
+                        <th data-sort="rollno">Roll No. &#x21C5;</th>
+                        <th data-sort="branch">Branch &#x21C5;</th>
+                        <th data-sort="year">Year &#x21C5;</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="pagination">
+                <button id="prev-page">Previous</button>
+                <span id="page-info"></span>
+                <button id="next-page">Next</button>
+            </div>
+
+            <!-- Edit panel: appears when clicking Edit -->
+            <div id="edit-panel" style="display:none; margin-top:20px; padding:15px; border:1px solid #ddd; border-radius:6px; background:#fafafa;">
+                <h3>Edit Student</h3>
+                <div style="display:flex; flex-direction:column; gap:8px; max-width:600px;">
+                    <label for="edit-name">Name:</label>
+                    <input type="text" id="edit-name">
+
+                    <label for="edit-rollno">Roll No.:</label>
+                    <input type="text" id="edit-rollno">
+
+                    <label for="edit-branch">Branch:</label>
+                    <select id="edit-branch">
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Electrical Engineering">Electrical Engineering</option>
+                        <option value="Mechanical Engineering">Mechanical Engineering</option>
+                        <option value="Civil Engineering">Civil Engineering</option>
+                        <option value="Others">Others</option>
+                    </select>
+
+                    <label for="edit-year">Year:</label>
+                    <select id="edit-year">
+                        <option value="1st Year">1st Year</option>
+                        <option value="2nd Year">2nd Year</option>
+                        <option value="3rd Year">3rd Year</option>
+                        <option value="4th Year">4th Year</option>
+                    </select>
+
+                    <label for="edit-email">Email (read-only):</label>
+                    <input type="email" id="edit-email" disabled style="background:#eee;">
+
+                    <div style="margin-top:8px;">
+                        <button id="edit-save">Save</button>
+                        <button id="edit-cancel" type="button" style="background:#888; margin-left:8px;">Cancel</button>
+                        <span id="edit-error" style="color:red; margin-left:12px;"></span>
+                    </div>
+                </div>
+            </div>
+            <button id="export-csv">Export to CSV</button>
+            <button id="export-json">Export to JSON</button>
+            <button id="import-json">Import from JSON</button>
+            <input type="file" id="import-file" accept=".json" style="display: none;">
+        </div>
+        <p>Student? <a href="index.html" style="color: #4CAF50; font-weight: bold;">Register here</a></p>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const loginSection = document.getElementById('login-section');
+        const adminContent = document.getElementById('admin-content');
+        const tableBody = document.getElementById('student-table').querySelector('tbody');
+        const searchInput = document.getElementById('search-input');
+        const branchFilter = document.getElementById('branch-filter');
+        const yearFilter = document.getElementById('year-filter');
+        const prevPageBtn = document.getElementById('prev-page');
+        const nextPageBtn = document.getElementById('next-page');
+        const pageInfo = document.getElementById('page-info');
+        const exportCsvBtn = document.getElementById('export-csv');
+        const exportJsonBtn = document.getElementById('export-json');
+        const importJsonBtn = document.getElementById('import-json');
+        const importFile = document.getElementById('import-file');
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const editPanel = document.getElementById('edit-panel');
+        const editName = document.getElementById('edit-name');
+        const editRoll = document.getElementById('edit-rollno');
+        const editBranch = document.getElementById('edit-branch');
+        const editYear = document.getElementById('edit-year');
+        const editEmail = document.getElementById('edit-email');
+        const editSaveBtn = document.getElementById('edit-save');
+        const editCancelBtn = document.getElementById('edit-cancel');
+        const editError = document.getElementById('edit-error');
+
+        let editingIndex = null; // index in students array currently being edited
+
+        const SECURITY_KEY = 'admin123'; // Hardcoded for demo; change in production
+
+        let students = [];
+        let currentPage = 1;
+        const rowsPerPage = 10;
+        let sortColumn = 'name';
+        let sortDirection = 'asc';
+        let searchTerm = '';
+        let selectedBranch = 'all';
+        let selectedYear = 'all';
+        let db;
+
+        // Initialize IndexedDB
+        const request = indexedDB.open('StudentDB', 1);
+        request.onerror = () => console.error('IndexedDB error');
+        request.onsuccess = () => {
+            db = request.result;
+        };
+        request.onupgradeneeded = (event) => {
+            db = event.target.result;
+            db.createObjectStore('students', { keyPath: 'rollno' });
+        };
+
+        loginForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const key = document.getElementById('security-key').value;
+            if (key === SECURITY_KEY) {
+                loginSection.style.display = 'none';
+                adminContent.style.display = 'block';
+                loadStudents();
+                renderTable();
+            } else {
+                loginError.textContent = 'Invalid security key.';
+            }
+        });
+
+        function loadStudents() {
+            const transaction = db.transaction(['students'], 'readonly');
+            const store = transaction.objectStore('students');
+            const getAll = store.getAll();
+            getAll.onsuccess = () => {
+                students = getAll.result || [];
+                renderTable();
+            };
+        }
+
+        function saveStudents() {
+            const transaction = db.transaction(['students'], 'readwrite');
+            const store = transaction.objectStore('students');
+            store.clear();
+            students.forEach(student => store.add(student));
+        }
+
+        function renderTable() {
+            let filteredStudents = students.filter(student => {
+                const matchesSearch = 
+                    student.name.toLowerCase().includes(searchTerm) ||
+                    student.rollno.includes(searchTerm) ||
+                    student.email.toLowerCase().includes(searchTerm);
+                const matchesBranch = selectedBranch === 'all' || student.branch === selectedBranch;
+                const matchesYear = selectedYear === 'all' || student.year === selectedYear;
+                return matchesSearch && matchesBranch && matchesYear;
+            });
+
+            filteredStudents.sort((a, b) => {
+                let valA = a[sortColumn];
+                let valB = b[sortColumn];
+                if (sortColumn === 'rollno') {
+                    valA = parseInt(valA);
+                    valB = parseInt(valB);
+                }
+                if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+                if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            const totalPages = Math.ceil(filteredStudents.length / rowsPerPage) || 1;
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const paginatedStudents = filteredStudents.slice(start, end);
+
+            tableBody.innerHTML = '';
+            paginatedStudents.forEach((student) => {
+                const globalIndex = students.indexOf(student);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${student.rollno}</td>
+                    <td>${student.branch}</td>
+                    <td>${student.year}</td>
+                    <td>${student.email}</td>
+                    <td class="actions">
+                        <button class="edit-btn" onclick="editStudent(${globalIndex})">Edit</button>
+                        <button class="delete-btn" onclick="deleteStudent(${globalIndex})">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+            prevPageBtn.disabled = currentPage === 1;
+            nextPageBtn.disabled = currentPage >= totalPages;
+        }
+
+        // Search with debounce
+        let debounceTimer;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                searchTerm = searchInput.value.toLowerCase().trim();
+                currentPage = 1;
+                renderTable();
+            }, 300);
+        });
+
+        // Filters
+        branchFilter.addEventListener('change', () => {
+            selectedBranch = branchFilter.value;
+            currentPage = 1;
+            renderTable();
+        });
+        yearFilter.addEventListener('change', () => {
+            selectedYear = yearFilter.value;
+            currentPage = 1;
+            renderTable();
+        });
+
+        // Pagination
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+            }
+        });
+        nextPageBtn.addEventListener('click', () => {
+            const filteredLength = students.filter(student => {
+                const matchesSearch = 
+                    student.name.toLowerCase().includes(searchTerm) ||
+                    student.rollno.includes(searchTerm) ||
+                    student.email.toLowerCase().includes(searchTerm);
+                const matchesBranch = selectedBranch === 'all' || student.branch === selectedBranch;
+                const matchesYear = selectedYear === 'all' || student.year === selectedYear;
+                return matchesSearch && matchesBranch && matchesYear;
+            }).length;
+            if (currentPage < Math.ceil(filteredLength / rowsPerPage)) {
+                currentPage++;
+                renderTable();
+            }
+        });
+
+        // Sorting
+        document.querySelectorAll('th[data-sort]').forEach(th => {
+            th.addEventListener('click', () => {
+                const column = th.dataset.sort;
+                if (sortColumn === column) {
+                    sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+                } else {
+                    sortColumn = column;
+                    sortDirection = 'asc';
+                }
+                renderTable();
+            });
+        });
+
+        window.editStudent = function(index) {
+            editingIndex = index;
+            const student = students[index];
+            editName.value = student.name;
+            editRoll.value = student.rollno;
+            editBranch.value = student.branch;
+            editYear.value = student.year;
+            editEmail.value = student.email;
+            editError.textContent = '';
+            editPanel.style.display = 'block';
+            // Scroll into view so admin sees the edit panel
+            editPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        };
+
+        editCancelBtn.addEventListener('click', () => {
+            editingIndex = null;
+            editPanel.style.display = 'none';
+        });
+
+        editSaveBtn.addEventListener('click', () => {
+            editError.textContent = '';
+            const name = editName.value.trim();
+            const rollno = editRoll.value.trim();
+            const branch = editBranch.value;
+            const year = editYear.value;
+
+            if (name === '' || name.length < 3) {
+                editError.textContent = 'Name must be at least 3 characters.';
+                return;
+            }
+            if (rollno === '' || !/^[a-zA-Z0-9]{6,11}$/.test(rollno)) {
+                editError.textContent = 'Roll No. must be 6-11 alphanumeric characters.';
+                return;
+            }
+            if (branch === '') {
+                editError.textContent = 'Branch is required.';
+                return;
+            }
+            if (year === '') {
+                editError.textContent = 'Year is required.';
+                return;
+            }
+
+            // Check for duplicate rollno (allow same as current student)
+            const duplicate = students.some((s, i) => (s.rollno === rollno || s.email === editEmail.value) && i !== editingIndex);
+            if (duplicate) {
+                editError.textContent = 'Roll No. or Email already exists.';
+                return;
+            }
+
+            // Update in-memory student and persist
+            const updated = { name, rollno, branch, year, email: editEmail.value };
+            students[editingIndex] = updated;
+            saveStudents();
+            renderTable();
+            editingIndex = null;
+            editPanel.style.display = 'none';
+        });
+
+        window.deleteStudent = function(index) {
+            if (confirm('Are you sure you want to delete this student?')) {
+                students.splice(index, 1);
+                saveStudents();
+                renderTable();
+            }
+        };
+
+        // Export to CSV
+        exportCsvBtn.addEventListener('click', () => {
+            const csv = ['Name,Roll No.,Branch,Year,Email'];
+            students.forEach(s => csv.push(`${s.name},${s.rollno},${s.branch},${s.year},${s.email}`));
+            downloadFile('students.csv', csv.join('\n'));
+        });
+
+        // Export to JSON
+        exportJsonBtn.addEventListener('click', () => {
+            const json = JSON.stringify(students, null, 2);
+            downloadFile('students.json', json);
+        });
+
+        // Import from JSON
+        importJsonBtn.addEventListener('click', () => importFile.click());
+        importFile.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const imported = JSON.parse(e.target.result);
+                        // Basic validation for imports
+                        students = imported.filter(s => s.name && s.rollno && s.branch && s.year && s.email);
+                        saveStudents();
+                        renderTable();
+                        alert('Import successful!');
+                    } catch (err) {
+                        alert('Invalid JSON file.');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function downloadFile(filename, content) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Dark Mode
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+        }
+        darkModeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
+        });
+        document.getElementById('logout-btn').addEventListener('click', function() {
+        window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>
