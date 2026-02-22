@@ -53,6 +53,7 @@ You can also view it online via GitHub Pages:
 1. **Secure Login**
    - Password-protected admin access via security key
    - Simple authentication mechanism (hardcoded for demo; change in production)
+   - Admin Security Key --("admin123")
 
 2. **Student Data Management**
    - **View**: Display all registered students in a sortable, filterable table
