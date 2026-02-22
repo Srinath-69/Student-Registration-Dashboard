@@ -16,7 +16,7 @@ The system aims to:
 ## 🌐 Live Demo
 You can also view it online via GitHub Pages:  
 
-👉 [Click here](https://srinath-69.github.io/Smart-Attendace-Tracker/)
+👉 [Click here](https://srinath-69.github.io/Student-Registration-Dashboard/)
 
 ## Project Features
 
