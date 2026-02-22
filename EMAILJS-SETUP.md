@@ -48,5 +48,3 @@ Example replacements in the current code:
 - If emails fail, check the browser console for errors and verify the Service ID, Template ID and Public Key.
 - Verify your EmailJS service is active and that the template variables match exactly.
 - Use the EmailJS dashboard's test/send feature to validate templates.
-
-If you want, I can update `index.html` to read keys from a local config file (not committed) or add instructions to load them from environment variables during a build.
